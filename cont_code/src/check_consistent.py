@@ -22,3 +22,22 @@ def multi_col_unique(df):
         ).transform('first').map('OLD{}'.format)
     )[['old_id'] + df.columns.tolist()]
     return test
+
+def match_movie_info():
+    """
+    given old and new dataframe with movie_title, year, old_id (old) and movie_title, year, new_id (new),
+    returns 1. unified union dataframe with movie_title, union_id, year
+            2. map of (old_id, union_id), (new_id, union_id)
+    """
+    # TODO need to add old_id for old_movie
+    return
+
+
+
+def match_person_info():
+    """
+    given old and new dataframe with person name, old_id (old) and person name, birthyear, new_id (new),
+    returns 1. unified union dataframe with person name, id, person name, birthyear
+            2. map of (old_id, union_id), (new_id, union_id)
+    """
+    return

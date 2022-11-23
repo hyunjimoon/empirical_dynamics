@@ -49,18 +49,59 @@ def movie(old_columns = ['title', 'year'], new_columns = ['titleId', 'title', 'y
     new_movie.to_pickle("new_movie_year_title_typemovie.pkl")
     return #old_movie, new_movie
 
-def person(old_columns, new_columns, ):
+
+def person(old_columns = ['id', 'name'] ):
+#     """
+#     1. compare old_person with new_person using name (only new data has born/death year?)
+#     2.
+#
+#     **title.principals.tsv.gz** – Contains the principal cast/crew for titles
+#
+# -   tconst (string) - alphanumeric unique identifier of the title
+# -   ordering (integer) – a number to uniquely identify rows for a given titleId
+# -   nconst (string) - alphanumeric unique identifier of the name/person
+# -   category (string) - the category of job that person was in
+# -   job (string) - the specific job title if applicable, else '\N'
+# -   characters (string) - the name of the character played if applicable, else '\N'
+#     """
+
     os.chdir(os.getcwd() + "/data/movie")
-    # old_movie = pd.read_pickle("../data/movie/old_title.pkl")
-    # old_movie.columns = ['id', 'title','imdbIndex','kindID', 'year', 'imdbID',
+    old_person = pd.read_pickle("old_person.pkl")
+    old_person.columns = ['id', 'name', 'imdbIndex', 'imdbId', 'gender', 'namePcodeCf', 'namePcodeNf', 'surnamePcode', 'md5sum']
+    #old_person.columns = ['id', 'personID','infoTypeID','info', 'note']
     #                     'phoneticCode', 'episodeOfID', 'seasonNr', 'episodeNr', 'seriesYears', 'md5sum']
 
-    # new_movie_aka = pd.read_pickle('new_movie_akas.pkl')
+    new_person = pd.read_pickle('new_person_basics.pkl')
+    new_person.rename(columns={'primaryName': 'name', 'birthYear': 'year'}, inplace=True)
     # new_movie_basic = pd.read_pickle('new_movie_basics.pkl')
     # new_movie_basic = new_movie_basic.rename(columns = {"tconst": "titleId", 'originalTitle': 'title', 'startYear': 'year'})
 
     #new_movie_director = pd.read_pickle("data/imdb22/22title_crew.pkl")
     #newtitle_id.columns = ['titleId', 'directors', 'writers']
+
+    return old_person, new_person
+def movie_person():
+    os.chdir(os.getcwd() + "/data/movie")
+    """
+        DBTable('CompleteCast', #1.3m
+            DBCol('id', INTCOL, notNone=True, alternateID=True),
+            DBCol('movieID', INTCOL, index='idx_mid'),
+            DBCol('subjectID', INTCOL, notNone=True, index='idx_sid'),
+            DBCol('statusID', INTCOL, notNone=True)),
+
+
+    """
+    old_movie = pd.read_pickle("../data/movie/old_title.pkl")
+    old_person = pd.read_pickle("old_person.pkl")
+    # old_movie.columns = ['id', 'title','imdbIndex','kindID', 'year', 'imdbID',
+    #                     'phoneticCode', 'episodeOfID', 'seasonNr', 'episodeNr', 'seriesYears', 'md5sum']
+
+    new_person_name_movie = pd.read_pickle('new_person_basics.pkl')
+    new_movie_person_character = pd.read_pickle('new_movie_principals.pkl')
+    new_pm = pd.merge(new_person_name_movie, new_movie_person_character, on='nconst')
+    np = new_pm[['nconst', 'tconst', 'category', 'characters']]
+    pmc = np.loc[(np.category == 'actor') | (np.category == 'actress')] # 52m to 20m (1m movie - avg of 20?)
+    pmc.to_pickle("new_person_movie_character.pkl")  # 52m
 
     return
 
@@ -128,13 +169,14 @@ def join_movie(old_movie, new_movie):
     mo = pd.merge(old_movie, new_movie, on=('title', 'year'), how='outer') # 2m
     mi.drop_duplicates(subset=['old_id', 'titleId'], keep='first', inplace=True, ignore_index=True)
     mo.drop_duplicates(subset=['old_id', 'titleId'], keep='first', inplace=True, ignore_index=True)
-    mi.reset_index(inplace = True)
+    mi.set_index('titleId', inplace = True)
     mo.reset_index(inplace = True)
 
-    columns = ['index', 'old_id', 'title', 'year', 'titleId']
+    outer_columns = ['index', 'old_id', 'title', 'year', 'titleId']
+    inner_columns = ['old_id', 'title', 'year']
 
-    mo[columns].to_csv("mo.tsv", sep='\t', index = False)
-    mi[columns].to_csv("mi.tsv", sep='\t', index = False)
+    mo[outer_columns].to_csv("mo.tsv", sep='\t', index = False)
+    mi[inner_columns].to_csv("mi.tsv", sep='\t')
     return
 
 

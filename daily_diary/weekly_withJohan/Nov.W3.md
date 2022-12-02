@@ -1,7 +1,4 @@
-#skq
-- durable_dominance git push remove large file
-- pandas assign (not dataframe, but each component of column)
-- 
+
 
 
 ## Before
@@ -29,3 +26,5 @@
 -   writers (array of nconsts) – writer(s) of the given title
 
 ## After
+- filter movies in old but not in new by mapping the title with genre in new 
+- apply this algorithm to not only movies but also tv series 

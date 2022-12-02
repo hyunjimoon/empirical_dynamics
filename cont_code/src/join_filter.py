@@ -2,7 +2,7 @@ import os
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from .match_format import get_data_path, get_plot_path, txt2df
+from .match_format import get_data_path, get_plot_path, txt2df, set_dir_moviedata, set_dir_agencydata
 
 ################ IMDB data
 
@@ -13,7 +13,8 @@ def movie(old_columns = ['title', 'year'], new_columns = ['titleId', 'title', 'y
     cut_num: int type row number to cut until
     characters: list of character to exclude
     """
-    os.chdir(os.getcwd() + "/data/movie")
+    #os.chdir(os.getcwd() + "/data/movie")
+    set_dir_moviedata()
     # old_movie = pd.read_pickle("../data/movie/old_title.pkl")
     # old_movie.columns = ['id', 'title','imdbIndex','kindID', 'year', 'imdbID',
     #                     'phoneticCode', 'episodeOfID', 'seasonNr', 'episodeNr', 'seriesYears', 'md5sum']
@@ -65,7 +66,7 @@ def person(old_columns = ['id', 'name'] ):
 # -   characters (string) - the name of the character played if applicable, else '\N'
 #     """
 
-    os.chdir(os.getcwd() + "/data/movie")
+    set_dir_moviedata()
     old_person = pd.read_pickle("old_person.pkl")
     old_person.columns = ['id', 'name', 'imdbIndex', 'imdbId', 'gender', 'namePcodeCf', 'namePcodeNf', 'surnamePcode', 'md5sum']
     #old_person.columns = ['id', 'personID','infoTypeID','info', 'note']
@@ -81,7 +82,7 @@ def person(old_columns = ['id', 'name'] ):
 
     return old_person, new_person
 def movie_person():
-    os.chdir(os.getcwd() + "/data/movie")
+    set_dir_moviedata()
     """
         DBTable('CompleteCast', #1.3m
             DBCol('id', INTCOL, notNone=True, alternateID=True),

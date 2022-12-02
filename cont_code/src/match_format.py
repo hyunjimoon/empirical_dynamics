@@ -113,30 +113,11 @@ def is_english(word):
 #         print(i)
 #     return
 
+def set_dir_moviedata():
+    os.chdir(os.getcwd() + "/data/movie")
 
-# def title(old_columns, new_columns):
-#     """
-#     old_df: dataframe on imdb13 data
-#     new_df: dataframe on imdb13 data
-#     cut_num: int type row number to cut until
-#     characters: list of character to exclude
-#     """
-#     oldtitle = pd.read_pickle("data/imdb13/13title.pkl")
-#     newtitle_id = pd.read_pickle("data/imdb22/22title_crew.pkl")
-#     newtitle_name = pd.read_pickle('data/imdb22/22movie_akas.pkl')
-#
-#     oldtitle.columns = ['id', 'title','imdbIndex','kindID', 'productionYear', 'imdbID',
-#                         'phoneticCode', 'episodeOfID', 'seasonNr', 'episodeNr', 'seriesYears', 'md5sum']
-#
-#     newtitle_id.columns = ['titleId', 'directors', 'writers']
-#
-#     newtitle = pd.merge(newtitle_id, newtitle_name, on = "titleId", )
-#
-#     oldtitle[old_columns].to_pickle("analysis/data/imdb13/oldtitle.pkl")
-#     newtitle[new_columns].to_pickle("analysis/data/imdb22/newtitle.pkl")
-#     return
-
-
+def set_dir_agencydata():
+    os.chdir(os.getcwd() + "/data/agency")
 
 def pd_set_display():
     pd.set_option('display.max_rows', None)

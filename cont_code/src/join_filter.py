@@ -2,8 +2,8 @@ import os
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from .match_format import get_data_path, get_plot_path, txt2df, set_dir_moviedata, set_dir_agencydata
-
+from .match_format import get_data_path, get_plot_path, txt2df, set_dir_moviedata, is_english, set_dir_agencydata
+import re
 ################ IMDB data
 
 def movie(old_columns = ['title', 'year'], new_columns = ['titleId', 'title', 'year', 'region', 'titleType'], main = "basic_major", frac = 1):
@@ -29,22 +29,23 @@ def movie(old_columns = ['title', 'year'], new_columns = ['titleId', 'title', 'y
     # new_movie_basic_columns = ['titleId','primaryTitle', 'title', 'year', 'titleType']
     # new_movie_aks_colmns = ['titleId', 'region', 'title']
     # if main == "basic_major":
-    #     new_movie = pd.merge(new_movie_basic[new_movie_basic_columns], new_movie_aka[new_movie_aks_colmns],   on=('titleId', 'title'), how = "left") #11m
+    #     new_movie = pd.merge(new_movie_basic[new_movie_basic_columns], new_movie_aka[new_movie_aks_colmns], on=('titleId', 'title'), how = "left") #11m
     # elif main == "aka_major":
-    #     new_movie = pd.merge(new_movie_basic[new_movie_basic_columns], new_movie_aka[new_movie_aks_colmns],   on=('titleId', 'title'), how = "right") #33m
+    #     new_movie = pd.merge(new_movie_basic[new_movie_basic_columns], new_movie_aka[new_movie_aks_colmns], on=('titleId', 'title'), how = "right") #33m
 
     #old_movie.to_pickle("old_movie.pkl")
     #new_movie.to_pickle("new_movie.pkl")
 
     # FILTER ROWS
-    #old_movie = pd.read_pickle('old_movie.pkl').loc[:, old_columns]
+    old_movie = pd.read_pickle('old_movie.pkl').loc[:, old_columns]
     new_movie = pd.read_pickle('new_movie.pkl').loc[:, new_columns] #f'{data_path}new_movie.pkl'
 
     # FILTER COLUMNS
-    #old_movie, new_movie = filter_rows_random(old_movie, new_movie, frac=1) #.0001)
+    old_movie, new_movie = filter_rows_random(old_movie, new_movie, frac=.00001)
+    old_movie = filter_movie_lang(filter_year(filter_title(old_movie)))
 
-
-    #old_movie = filter_year(filter_title(old_movie))
+    # JOIN OLD NEW
+    mo = join_movie(old_movie, new_movie)
     new_movie = filter_year(filter_title(filter_movie_others(new_movie), characters = ['Pilot', 'Finale']), is_old = False) # 169k
     #old_movie.to_pickle("old_movie_year_title.pkl")
     new_movie.to_pickle("new_movie_year_title_typemovie.pkl")
@@ -57,7 +58,6 @@ def person(old_columns = ['id', 'name'] ):
 #     2.
 #
 #     **title.principals.tsv.gz** – Contains the principal cast/crew for titles
-#
 # -   tconst (string) - alphanumeric unique identifier of the title
 # -   ordering (integer) – a number to uniquely identify rows for a given titleId
 # -   nconst (string) - alphanumeric unique identifier of the name/person
@@ -123,7 +123,7 @@ def filter_title(df, characters=['#', '-0', '-1']):
 def filter_na(df, column):
     return df[~df.loc[: , column].isnull()]
 
-def filter_year(df, is_old = True):
+def filter_year(df, year, is_old = True):
     # # OLD MOVIE
     if is_old:
         df = df[~df['year'].isnull()]
@@ -135,6 +135,9 @@ def filter_year(df, is_old = True):
         df = df[~df.year.isnull()]
         df.loc[:, 'year'] = df.year.apply(lambda x: int(x) if str(x).isnumeric() else -1)
         df = df[df.year > 0]# 170k
+
+    # MOVIE by year
+    df = df[df.year == year]
     # PERSON
 
     return df
@@ -147,7 +150,10 @@ def filter_movie_others(df, region = "US", titleType = "movie"):
     #newtitle = newtitle[newtitle['language'] == "en"]
     return df
 
-
+def filter_movie_lang(df):
+    df['lang'] = df.title.apply(lambda x: is_english(x))
+    df.to_pickle("old_movie_lang.pkl")
+    return
 def filter_person_others(df, region = "US"):
     """
     characters other than title (name), year (identifier?) of person (actor) characterizing it
@@ -178,7 +184,7 @@ def join_movie(old_movie, new_movie):
 
     mo[outer_columns].to_csv("mo.tsv", sep='\t', index = False)
     mi[inner_columns].to_csv("mi.tsv", sep='\t')
-    return
+    return mo
 
 
 ################ FED data

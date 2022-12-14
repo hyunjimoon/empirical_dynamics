@@ -1,2 +1,0 @@
-- input: daily_dev
-- output: questions to Johan, discussion for the next week

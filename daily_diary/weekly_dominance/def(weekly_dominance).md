@@ -1,0 +1,5 @@
+- input: daily_dev
+- output: questions to Johan, discussion for the next week
+- [[Nov.W2]]
+- [[Nov.W3]]
+- [[Dec.W1]]

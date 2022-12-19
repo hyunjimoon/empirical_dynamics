@@ -1,7 +1,27 @@
 - Ajeossi is in six other region for newtitle with current tid (filtered out because non-eng region)
 	- reason why  we couldn't find in .tsv file was `tt1527788` is not in movie_basic (merged movie_basics and movie_principals)
-	- [[Pasted image 20221214075635.png]]
-- [[winner's woe]]
+	- ![[Pasted image 20221214075635.png]]
+- data provanence 2 by 2 table of (`title`, `year`)
+
+| -            | title | allowable difference |     |
+| ------------ | ----- | -------------------- | --- |
+| year         |   1    |    2                  |     |
+| <2 year diff | 3      |   4                   |     |
+
+- fill in the four cells (using `drop_duplicates`)
+- iter2_mt[iter2_mt.titleId=='tt1527788']
+
+ - data provenance is defined as: a record that describes entities and processes involved in producing and delivering or otherwise influencing that resource. Provenance provides a critical foundation for assessing authenticity, enabling trust, and allowing reproducibility. Provenance assertions are a form of contextual metadata and can themselves become important records with their own provenance
+
+
+- feedback on [[winner's woe]]
+	- need to be more in concrete setting; more veracity, reflect reality amap
+	- movie or subscription (assumption user will only choose between the two)
+	- change follower vs leader name to company A, B(as it would oscillate)
+	- marketing companies would have data on `push unit` (e.g. AB testing)
+	- need concrete mechanism on how pull strategy is activated in specific setting
+		- is it movie or subscription? if movie (disney, pixar), people does not necessarily see only one movies, if subscription (netflix, hbo), people discarding `adopted` compartment of either leader or follower would not return to leader for certain amount of period (hazir's formulation of vaccine effect erosion would help)
+		- network effect could be one e.g. ipod earphone is white which is easily seen by others
 - data structure: xarray, [datatree](https://xarray-datatree.readthedocs.io/en/latest/api.html#indexing)
 
 ```
@@ -44,18 +64,6 @@ Inferencedata
 
 Just like `prior` , `observed_data`, `prior_predictive`
 Groups have `title_string` ,`year` etc dims
-
-output_format = dict(
-	"iter0_otitle": ["titleId"], 
-	"iter0_ntitle": ["titleId"], 
-	"iter1_title": ["titleId"], 
-	"iter2_title": ["titleId"],  # usregion, english title, 
-	"iter0_operson": ["personId"], 
-	"iter0_nperson": ["personId"], 
-	"iter1_person": ["personId"], 
-	"iter2_person": ["personId"],  
-)
-indexed by (title, year). Interestingly this reminds me of stacking chain and draw into `prior_draw`.
 
 and wondering what advantage I can have if I trun this into inferencedata (other than conveinience of)
 

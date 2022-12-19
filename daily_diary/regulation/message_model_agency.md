@@ -1,3 +1,10 @@
+- larger approval
+- cost to mistake 
+
+interview question:
+- how much time you spend reporting people
+- are there new reporting you need to do compared to a few years (if so, what is the cause?)
+- national lab (ethernet, longer time, data security encoding)
 
 #vyq 
 1. should we use reference task for initial value for done right, done wrong, checked, undetected, detected etc?

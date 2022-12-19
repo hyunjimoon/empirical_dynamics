@@ -89,7 +89,7 @@ def df2actor(df, year_from = 1900, year_to = 2030):
 
 
 def set_dir_moviedata():
-    os.chdir("/Users/hyunjimoon/Dropbox/tolzul/BayesSD/ContinuousCode/3_Data4DM/empirical_dynamics/cont_code/data/movie")
+    os.chdir("/Users/hyunjimoon/Dropbox/tolzul/BayesSD/ContinuousCode/empirical_dynamics/cont_code/data/movie")
     #os.chdir(os.getcwd() + "/data/movie")
 
 def set_dir_agencydata():

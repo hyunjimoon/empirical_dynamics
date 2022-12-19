@@ -47,4 +47,6 @@ e.g. AF-DEPARTMENT OF THE AIR FORCE , full list:
 AGYSUB, AGYSUBT: 533 types  
 e.g. airforce: 55 AF02 (AIR FORCE INSPECTION AGENCY), AF03 (AIR FORCE OPERARTIOANL TEST AND EVALUATION)
 
+bigger has better quality
+
 full list is in [[hierarchical data structure of agency]].

@@ -1,5 +1,5 @@
-from cont_code.movie.iter0 import set_dir_moviedata
-from cont_code.movie.iter import sel_title, sel_year, sel_region_type, sel_rows_random, join_movie, save_iter, compare_mental_material
+from iter0 import set_dir_moviedata
+from iter import sel_title, sel_year, sel_region, sel_titleType, sel_rows_random, join_movie, save_iter, compare_mental_material
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -71,7 +71,7 @@ def make_consistent_title(old_columns = ['title', 'year'], new_columns = ['title
     ##################################################################################
     ## ITER 1: DATA READ, CLEANING, OPT OUT SELECT ROWS ####################
     ##################################################################################
-    ITER = 1
+    ITER = 'optout'
     set_dir_moviedata()
     #prepare_title_data(IS_SAVE)
 
@@ -83,18 +83,16 @@ def make_consistent_title(old_columns = ['title', 'year'], new_columns = ['title
     old_movie, new_movie = sel_rows_random(old_movie, new_movie, frac=frac) #.00001
 
     old_movie = sel_year(sel_title(old_movie, ITER), ITER)
-    new_movie = sel_year(sel_title(new_movie, ITER, characters= ['Final', 'Pilot'], is_old=False), ITER, is_old=False)
-    print("ITER1 COMPLETE", old_movie, new_movie)
-    save_iter(old_movie, ITER, IS_SAVE, IS_PKL) #old_movie.shape[0] 1.7m
-    save_iter(new_movie, ITER, IS_SAVE, IS_PKL) #new_movie.shape[0] 10m
+    new_movie = sel_year(sel_title(new_movie, ITER, is_old=False), ITER, is_old=False)
+    save_iter(old_movie, ITER, IS_SAVE, IS_PKL, is_old = True) #old_movie.shape[0] 1.7m
+    save_iter(new_movie, ITER, IS_SAVE, IS_PKL, is_old = False) #new_movie.shape[0] 10m
     #compare_mental_material(old_movie, ITER)
     #compare_mental_material(new_movie, ITER, is_old=False)
-    idata_lst.append(old_movie)
-    new_movie.to_xarray().stack(['title', 'year'])
+
     ##################################################################################
     ## ITER 2: JOIN
     ##################################################################################
-    ITER = 2
+    ITER = 'join'
     # TODO sel_title old_movie before or after merge? (if justifiable, the more the better for old)
 
     # JOIN OLD NEW
@@ -103,28 +101,25 @@ def make_consistent_title(old_columns = ['title', 'year'], new_columns = ['title
     compare_mental_material(new_movie, ITER, is_old=False)
 
     ##################################################################################
-    ## ITER 3: OPT IN SELECT ROWS: INFER title is ENG or then select ENG
+    ## ITER 3: OPT IN SELECT ROWS: INFER title is ENG or then select US region
     ##################################################################################
-    ITER = 3
-    mo_eng_us_movie = sel_region_type(sel_title(mo, ITER, characters = ['Pilot', 'Finale'])) # 169k
-    save_iter(mo_eng_us_movie, ITER, IS_SAVE, IS_PKL)
-    compare_mental_material(mo_eng_us_movie, ITER, is_old=True)
+    ITER = 'optin_ganesugong_eng'
+    mo_eng = sel_title(mo, ITER)  #sel_region(sel_title(mo, ITER)) 
+    # sel_title(mo)[sel_title(mo).titleId.isnull()]: #77k -> 93k after making 가내수공업개발
+    # sel_region_type(sel_title(mo))[sel_region_type(sel_title(mo)).titleId.isnull()]: 0
+    save_iter(mo_eng, ITER, IS_SAVE, IS_PKL)
+    compare_mental_material(mo_eng, ITER, is_old=True)
+
+    #mo_eng_us_movie = sel_titleType(mo_eng_us_movie)
 
     ##################################################################################
     ## ITER 4: SET DIFFERENCE
     ##################################################################################
-    ITER = 4
-    old_only = mo_eng_us_movie[mo_eng_us_movie.titleId.isnull()]
+    ITER = 'diff'
+    old_only = mo_eng[mo_eng.titleId.isnull()]
     old_only.year.hist()
     plt.savefig('old_not_new.png')
     old_only.groupby('year').count().sort_values(by = 'index',ascending=False)
-    old_only_dict = dict()
-    # for year in [1990, 1984, 1968, 1991]:
-    #     print(year)
-    #     print("\n")
-    #     print(old_only[old_only.year ==year])
-
-    print("#################OLD ONLY", old_only)
     save_iter(old_only, ITER, IS_SAVE, IS_PKL)
     #compare_mental_material(new_movie, ITER, is_old=True)
     # print compare
@@ -139,8 +134,6 @@ def make_consistent_title_person():
             DBCol('movieID', INTCOL, index='idx_mid'),
             DBCol('subjectID', INTCOL, notNone=True, index='idx_sid'),
             DBCol('statusID', INTCOL, notNone=True)),
-
-
     """
     #old_movie = pd.read_pickle("../data/movie/old_title.pkl")
     #old_person = pd.read_pickle("old_person.pkl")

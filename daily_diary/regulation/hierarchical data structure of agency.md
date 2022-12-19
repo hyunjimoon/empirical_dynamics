@@ -6,6 +6,13 @@
 3: 'Medium Independent Agencies (100-999 employees)': 
 4: 'Small Independent Agencies (less than 100 employees)':   
 
+- 'NN-NATIONAL AERONAUTICS AND SPACE ADMINISTRATION'
+- 'AF-DEPARTMENT OF THE AIR FORCE',
+- 'AR-DEPARTMENT OF THE ARMY',
+- 'DD-DEPARTMENT OF DEFENSE',
+- sports, 
+- mng to error rate is global; quality to desired worker is local
+- 
 #### Layer3 (130 AGY)
 e.g. AF-DEPARTMENT OF THE AIR FORCE , full list:
 'AA-ADMINISTRATIVE CONFERENCE OF THE UNITED STATES',

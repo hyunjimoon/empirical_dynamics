@@ -1,3 +1,25 @@
+## DecW2
+- go deeper and deeper [[Pasted image 20221215145106.png]]
+- utility function? correspondance of backlog (capability)
+	- e.g. Reorder Period (staffing??) [[Pasted image 20221215145353.png]]
+	- exposing to future information pattern recognition [[Pasted image 20221215145707.png]]
+- multiechelon (can have their own backlog?)
+- fast but ugly cannot exist
+- meaning of "not time but fraction" is 100 times faster
+- top ten troll (should model being hitting by adversity; murphy's law)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## W1
 - ratio: 

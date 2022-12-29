@@ -1,5 +1,21 @@
-protocol: after reading [[def(weekly_dominance)]], write summary of a day
+1 m immigrates to 10m country;
+```
+###### ITER perparing COMPLETE, size : 1048575 ###### ITER perparing COMPLETE, size : 10301370
+```
+after identifying
+gene composition [[common_mutant_nativeex.png]]
+- how to translate? 1001 gece -1001 Nights
 
+protocol: after reading [[def(weekly_dominance)]], write summary of a day
+[[Pasted image 20221228074709.png]] shows nan can result from both outer-join with mutant and native's absense
+
+- [cinemagoer's 2006 log](https://github.com/cinemagoer/cinemagoer/blob/f23449c1ac5ee9ab728874c3fa18ba05a285ed9b/CHANGELOG.txt#L1178) introduced the isSame() method for both Movie and Person classes,useful to compare object by movieID/personID and accessSystem.
+
+12.25
+- old data title aka is not usuable (doesn't have id to match with the original)
+- `old_id` as (title, year) of old movie confuses the analysis as most operations can be done with (title, year) groupy, instead of (old_id) groupby.
+- after filtering only year +-1, remaining old but not new would be between 85k to 92k (~ 10k decrease)
+- 
 12.13 
 - finding 
 - 

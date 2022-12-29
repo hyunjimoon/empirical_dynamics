@@ -1,3 +1,6 @@
+summary: filtering for us region after joining with old movie was a huge bug which explains zero return for old but not new
+
+ sel_region_type(sel_title(mo))[sel_region_type(sel_title(mo)).titleId.isnull()]: 0
 - pure old-new merge is 8m,  out of 100k null `titleId`, 40k is unique, but non-english was (german etc) too many, 
 - improved `is_eng` function by allowing ' and `"``
 - (after, # 52k increased to )

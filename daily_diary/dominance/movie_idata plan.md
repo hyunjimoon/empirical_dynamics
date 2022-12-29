@@ -1,3 +1,8 @@
+- data description by imdb: [[imdb22]]
+- goal: 
+	- compare old and new
+	- track person-wise movie
+- idata plan 
 ```
 output_format = dict(
 	"iter0_otitle": ["titleId"], 

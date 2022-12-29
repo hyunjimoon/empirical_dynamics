@@ -62,6 +62,11 @@ def make_pkl13(flie_lst):
         df = pd.read_csv(f"{filepath}/imdb13/{file}.csv")
         df.to_pickle(f"{filepath}/imdb13/{file}.pkl")
 
+def save_fig(iter_name, plot_name):
+    plot_path = get_plot_path(iter_name)
+    fig_name = f"{plot_path}/{plot_name}"
+    plt.savefig(f"{fig_name}.png")
+    return
 
 def make_pkl22(flie_lst):
     filepath = "../data"
@@ -107,26 +112,3 @@ def tsv2df(file_name):
     df = pd.read_csv(f'data/imdb22/{file_name}.tsv', on_bad_lines='skip', sep='\t')
     df.to_pickle(f'data/imdb22/{file_name}.pkl')
     return df
-
-def prepare_title_data(is_save):
-    print(os.getcwd())
-    old_movie = pd.read_pickle("old_title.pkl")
-    old_movie.columns = ['id', 'title','imdbIndex','kindID', 'year', 'imdbID',
-                        'phoneticCode', 'episodeOfID', 'seasonNr', 'episodeNr', 'seriesYears', 'md5sum']
-
-    new_movie_aka = pd.read_pickle('new_movie_akas.pkl')
-    new_movie_basic = pd.read_pickle('new_movie_basics.pkl')
-    new_movie_basic = new_movie_basic.rename(columns = {"tconst": "titleId", 'originalTitle': 'title', 'startYear': 'year'})
-
-    new_movie_director = pd.read_pickle("data/imdb22/22title_crew.pkl")
-    newtitle_id.columns = ['titleId', 'directors', 'writers']
-
-    new_movie_basic_columns = ['titleId','primaryTitle', 'title', 'year', 'titleType']
-    new_movie_aks_colmns = ['titleId', 'region', 'title']
-    if main == "basic_major":
-        new_movie = pd.merge(new_movie_basic[new_movie_basic_columns], new_movie_aka[new_movie_aks_colmns], on=('titleId', 'title'), how = "left") #11m
-    elif main == "aka_major":
-        new_movie = pd.merge(new_movie_basic[new_movie_basic_columns], new_movie_aka[new_movie_aks_colmns], on=('titleId', 'title'), how = "right") #33m
-    if IS_SAVE:
-        old_movie.to_pickle("old_movie.pkl")
-        new_movie.to_pickle("new_movie.pkl")

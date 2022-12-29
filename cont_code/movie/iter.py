@@ -3,72 +3,72 @@ import pandas as pd
 from iter0 import get_data_path, get_plot_path, txt2df
 import string
 
-
 ################ IMDB data
 
 # TODO: @Dashadower how to design when input is differetn for each iter
-def save_iter(df, iter, is_save, is_pkl, is_old = False):
-    if is_save:
-        if iter == 'optout':
-            if is_old:
-                df.to_pickle("1optout_old_title.pkl")
-            else:
-                df.to_pickle("1optout_new_title.pkl")
-        elif iter == 'join':
-            if is_pkl:
-                df.to_pickle("2join_merged_title.pkl")
-            else:
-                df.to_csv("2join_merged_title.tsv", sep='\t')
-        elif iter == 'optin_ganesugong_eng':
-            if is_pkl:
-                df.to_pickle("3opting_merged_title_eng_movie.pkl")
-                df.set_index('titleId').to_xarray().to_netcdf("3opting_merged_title_eng_movie.nc")
-            else:
-                df.to_csv("3opting_merged_title_eng_movie.tsv", sep='\t')
-        elif iter == 'diff':
-            if is_pkl:
-                df.to_pickle("4diff_only_old_title.pkl")
-                df.set_index('titleId').to_xarray().to_netcdf("4diff_only_old_title.nc")
-            else:
-                df.to_csv("4diff_only_old_title.tsv", sep='\t')
-
-
-def compare_mental_material(df, iter, is_old=True):  # TODO make this as writelines()
-    if iter == 'optout':
-        if is_old:
-            print("###### ITER optout COMPLETE\n", df)
+def save_iter(df, iter, is_imgrt = False):
+    if (iter == '0preparing') or (iter == '1outing'):
+        if is_imgrt:
+            df.to_csv(f"{iter}_imgrt" + ".tsv", sep = '\t')
         else:
-            print(df)
-    elif iter == 'join':
-        print("###### ITER join COMPLETE")
-        print("from merged table, only old's `titleId` is na, only new's `old_id`is na", df)
-        print("rows with titleId should include nonenglish term\n", df)
+            df.to_csv(f"{iter}_ntv" + ".tsv", sep = '\t')
+    else:
+        df.to_csv(f"{iter}" + ".tsv", sep = '\t')
 
-    elif iter == 'optin_ganesugong_eng' or iter == 'optin_opensource_eng':
-        print("###### ITER optin COMPLETE\n")
-        print("new_movie deleted na year + nonmovie type and non us region, nonenglish titiles", df)
+    if iter == '0preparing':
+        print("###### ITER perparing COMPLETE, size :", df.shape[0])
+        if is_imgrt:
+            df.to_pickle("old_title.pkl")
+        else:
+            df.to_pickle("new_title_ba_outer.pkl")        
+
+    elif iter == '1outing':
+        print("###### ITER outing COMPLETE, size :", df.shape[0])
+        if is_imgrt:
+            df.to_pickle(f'{iter}_imgrt_title.pkl')
+        else:
+            df.to_pickle(f'{iter}_ntv_title.pkl')
+
+    elif iter == '2merging':
+        print("###### ITER merging COMPLETE, size :", df.shape[0])
+        print("from merged table, only mutant's `tconst` is na, only ntv_ex's `imgrt_tyid`is na")
+        print("rows with tconst should include nonenglish term\n")
+        df.to_pickle(f'{iter}' + ".pkl")
+
+    elif iter == '3ining_gane_eng':
+        print("###### ITER ining_gane_eng COMPLETE, size :", df.shape[0])
+        print("optin english-like titles")
+        df.to_pickle(f'{iter}' + ".pkl")
+            #df.set_index('tconst').to_xarray().to_netcdf("3opting_merged_title_eng_title.nc")
+
+    elif iter == '4iding_mutant':
+        print("###### ITER iding_mutant COMPLETE, size :", df.shape[0])
+        df.to_pickle(f'{iter}' + ".pkl")
+    
+            #df.set_index('tconst').to_xarray().to_netcdf("4diff_only_imgrt_title.nc")
 
 
-def sel_title(df, iter, is_old=True):
+def sel_title(df, iter, is_imgrt=True):
     """"
     series of title from which any title that include at least one elemnet of character would be filtered
     iter:1 quick, dirty, opt-out way preprocessing
     iter:2 detailed e.g. title language, more crafty, opt-in way preprocessing
     """
-    if iter == 'optout':
-        df = df[~df.title.isnull()]  # 11k na for old title, 0 na for new title
-        if is_old:
-            for char in ['#', '-0', '-1', 'Final', 'Pilot']:
+    if iter == '1outing':
+        df = df[~df.title.isnull()]  # 11k na for imgrt title, 0 na for ntv title
+        if is_imgrt:
+            for char in ['#', '-0', '-1', 'Final', 'Pilot', 'Episode']:
                 df = df[~df['title'].str.contains(f"{char}", na=False)]
         else:
-            for char in ['Final', 'Pilot']:
+            for char in ['#', '-0', '-1', 'Final', 'Pilot', 'Episode']:
                 df = df[~df['title'].str.contains(f"{char}", na=False)]
-                # 11,578,172 -> 11,555,926 (optout Final), 11,545,080 (optout Pilot)
-    elif iter == 'optin_ganesugong_eng':
+                
+                # 11,578,172 -> 11,555,926 (optout Final), 11,545,080 (optout Pilot) -> 5m (oputout #, Episode)
+    elif iter == '3ining_gane_eng':
         df['soft_eng'] = df.title.apply(lambda x: is_english(x))
         df = df[df.soft_eng == True]
 
-    elif iter == 'optin_opensource_eng': #detect("Overdrive") # not very precise
+    elif iter == '3ining_opensource_eng': #detect("Overdrive") # not very precise
         raise NotImplementedError
 
         #df['strong_eng'] = df.title.apply(lambda x: detect(x))  # "Anajigoku" pass iter2, fail iter3 (sw)
@@ -77,70 +77,79 @@ def sel_title(df, iter, is_old=True):
     return df
 
 
-def sel_year(df, iter, is_old=True):
+def sel_year(df, iter, is_imgrt=True):
     """"
     series of title from which any title that include at least one elemnet of character would be filtered
-    iter:1 WEAK quick, dirty, opt-out way preprocessing for merging old and new
+    iter:1 WEAK quick, dirty, opt-out way preprocessing for merging imgrt and ntv
     iter:2 STRONG detailed e.g. title language, more crafty, opt-in  preprocessing
     """
-    if iter == 'optout':
-        if is_old:
-            df = df[~df['year'].isnull()]
+    if iter == '1outing':
+        df = df[~df['year'].isnull()]
+        if is_imgrt:
             df.year = df.year.astype('int')
         else:
-            df = df[~df.year.isnull()]
+            df.year = df.year.astype('int')
             df.loc[:, 'year'] = df.year.apply(lambda x: int(x) if str(x).isnumeric() else -1)
             df = df[df.year > 0]  # 170k
-    elif iter == 'optin_ganesugong_eng' or iter == 'optin_opensource_eng':
+    elif iter == '3ining_gane_eng' or iter == '3ining_opensource_eng':
         raise NotImplementedError
-        # # MOVIE by year
+        # # title by year
         # df = df[df.year == year]
     return df
 
 
-def sel_region(df, region="US"):
-    return  df[df['region'] == region]
+def sel_region(df):
+    nonus_lst = ['PT', 'SE', 'JP', 'IN', 'AU', 'GB', 'FR', 'ZA',
+       'NG', 'CA', 'NL', 'CM', 'XWG', 'AR', 'NO', 'IT', 'HR', 'MX', 'PL',
+       'BR', 'BE', 'FI', 'GR', 'AT', 'ES', 'CH', 'DE', 'UA', 'CL', 'MY',
+       'PH', 'IE', 'NZ', 'CSHH', 'MT', 'DK', 'RO', 'SI', 'CU', 'XYU',
+       'SG', 'EG', 'AE', 'HU', 'BA', 'PK', 'IL', 'SZ', 'LV', 'HK', 'IR',
+       'EC', 'KR', 'YUCS', 'BD', 'LB', 'CN', 'RU', 'GE', 'DDDE', 'SK',
+       'TR', 'CZ', 'ZM', 'LI', 'XWW', 'UY', 'MA', 'PS', 'TH', 'KE', 'VE',
+       'PE', 'ID', 'RS', 'DO', 'BG', 'PR', 'TW', 'JM', 'DZ', 'MO', 'LT',
+       'CO', 'BH', 'IS', 'XKV', 'TG', 'TN', 'MD', 'SN', 'LK', 'SV', 'UZ',
+       'BUMM', 'BW', 'CR', 'HT', 'PY', 'SUHH', 'PA', 'MU', 'CI', 'SY',
+       'AF', 'AL', 'NP', 'VN', 'MZ', 'AM', 'BF', 'ZW', 'RW', 'GH', 'KZ',
+       'BI', 'LA', 'AN', 'VDVN', 'TZ', 'MK', 'KG', 'GP', 'LU', 'EE', 'HN',
+       'SA', 'BO', 'BY', 'JO', 'TJ', 'CF', 'ML', 'UG', 'QA', 'CY', 'NI',
+       'KW', 'MV', 'CSXX', 'GI', 'TT', 'GT', 'KP', 'ET', 'AZ', 'ME', 'AO',
+       'XSA', 'VI', 'MN', 'FJ', 'KH', 'XEU', 'GF', 'GL', 'IQ', 'OM', 'CD',
+       'MM', 'LS', 'MG', 'AG', 'SR', 'BS', 'XKO', 'BM', 'AW', 'GU', 'SD',
+       'NE', 'PG', 'BB', 'GA', 'YE', 'GY', 'XPI', 'FO', 'XSI', 'GN', 'MQ',
+       'LY', 'SO', 'BZ', 'SL', 'BT', 'MS', 'AS', 'NU', 'TD', 'GW', 'LC',
+       'MC', 'TM', 'MR', 'BJ', 'CG', 'VA', 'SM', 'ER', 'XAS', 'AD', 'NC',
+       'VC', 'RE', 'VU', 'MW', 'TO', 'CK', 'PF', 'KY', 'ZRCD', 'CV', 'CW',
+       'VG', 'AQ', 'GM', 'TL', 'GQ', 'PW', 'AI', 'DM', 'IM', 'LR', 'NR',
+       'DJ', 'MP', 'SB', 'ST', 'BN', 'KN', 'TC', 'SC', 'SH', 'GD', 'CC',
+       'MH', 'KI', 'KM', 'EH', 'FM']
+    return  df[~df['region'].isin(nonus_lst)]
 
 
 def sel_titleType(df, titleType="movie"):
     return  df[df['titleType'] == titleType]
-
-
 
 def sel_person_others(df, region="US"):
     """
     characters other than title (name), year (identifier?) of person (actor) characterizing it
     """
     df = df[df['region'] == region]
-    # newtitle = newtitle[newtitle['language'] == "en"]
+    # ntvtitle = ntvtitle[ntvtitle['language'] == "en"]
     return df
 
 
-def sel_rows_random(old_df, new_df, frac=0.00001):
-    return old_df.sample(frac=frac), new_df.sample(frac=frac)
+def sel_rows_random(df, frac):
+    if frac < 1:
+        return df.sample(frac=frac)
+    else:
+        return df
 
+################## ITER merge #############################
 
-def join_movie(old_movie, new_movie, is_save):
-    # mi = pd.merge(old_movie, new_movie, on=('title', 'year'), how='inner')  # 600k
-    # mi.drop_duplicates(subset=['old_id', 'titleId'], keep='first', inplace=True, ignore_index=True)
-    # mi.set_index('titleId', inplace=True)
-    inner_columns = ['old_id', 'title', 'year']
-    # if is_save:
-    # mi[inner_columns].to_csv("mi.tsv", sep='\t')
-    print(old_movie)
-    print(new_movie)
-    mo = pd.merge(old_movie, new_movie, on=('title', 'year'), how='outer')  # 2m
-
-    # # print(mo.shape[0]) # 10m
-    # mo.to_csv("mo_1207.tsv", sep='\t')  # drop
-    mo.drop_duplicates(subset=['old_id', 'titleId'], keep='first', inplace=True, ignore_index=True)
-    # print(mo.shape[0])# 10m
+def merge_title(imgrt_title, ntv_title):
+    mo = pd.merge(imgrt_title, ntv_title, on=('title', 'year'), how='outer')  # 2m
+    mo.drop_duplicates(subset=['imgrt_tyid', 'tconst'], keep='first', inplace=True, ignore_index=True)
     mo.reset_index(inplace=True)
-    outer_columns = ['index', 'old_id', 'title', 'year', 'titleId']
-
-    if is_save:
-        mo[outer_columns].to_csv("mo.tsv", sep='\t', index=False)
-
+    outer_columns = ['index', 'imgrt_tyid', 'title', 'year', 'tconst']
     return mo
 
 
@@ -175,15 +184,28 @@ def is_english(word):
     eng_charc = f"{string.ascii_lowercase + string.ascii_uppercase}" + "0123456789" + " !_-=@#$%&*()/?+:;.,$<>" + "'"
     return len(set([i for i in word] + [e for e in eng_charc])) == 52 + 10 + 23
 
+################## ITER IMMIGRTE: MUTANT + NATIVE #############################
 
-# def make_title_lang(df, is_old=False, is_save=False):
-#     df['soft_eng'] = df.title.apply(lambda x: is_english(x))
-#     if is_save:
-#         if is_old:
-#             df.to_pickle("old_movie_lang.pkl")
-#         else:
-#             df.to_pickle("new_movie_lang.pkl")
-#     print("from make_title_lang", "length: ", df.shape[0], df.head())
-#     return
+# def optout_duplicated(df):
+#     unique = df[~df.duplicated(['imgrt_tyid'], keep=False)]
+#     duplicated_first = df[df.duplicated(['imgrt_tyid'], keep='first')]
+#     return pd.concat([unique, duplicated_first])
 
+def check_diversity(df, col_lst):
+    print(df.loc[:,col_lst].unique().shape[0])
+    return
 
+def mutant2tconst(df):
+    # separate (title, year)-based identifying system for type (e.g. movie and tvsyste)
+    # df[df.titleType == 'tvEpisode'].groupby()
+    tvEpisode = df[df.titleType=='tvEpisode']
+    short = df[df.titleType=='short']
+    movie = df[df.titleType=='movie']
+    
+    tvEpisode = tvEpisode.drop_duplicates('title', keep='first')
+    short = short.drop_duplicates(['title', 'year'], keep='first')
+    movie = movie.drop_duplicates(['title', 'year'], keep='first')
+    # for movie and short, groupby(title) and year +-1 should be munged
+    print(tvEpisode.shape[0], short.shape[0], movie.shape[0])
+        
+    return tvEpisode, short, movie

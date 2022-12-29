@@ -1,24 +1,19 @@
 from iter0 import set_dir_moviedata
-from iter import sel_title, sel_year, sel_region, sel_titleType, sel_rows_random, join_movie, save_iter, compare_mental_material
+from iter import sel_title, sel_year, sel_region, sel_rows_random, merge_title, save_iter, sel_region
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-def print_shape(old, new):
-    return old.shape[0], new.shape[0]
-
-
 def combine_col2id(df):
-    test = df.assign(
-        old_id =df.index.to_series().groupby(
+    imgrt_ty = df.assign(
+        imgrt_tyid =df.index.to_series().groupby(
             [df.title, df.year]
-        ).transform('first').map('OLD{}'.format)
-    )[['old_id'] + df.columns.tolist()]
-    return test
+        ).transform('first').map('tyid{}'.format)
+    )[['imgrt_tyid'] + df.columns.tolist()]
+    return imgrt_ty
 
-def veva_title(df):
+def veva_title2(df):
     """
-    verification: consistency between old and new
+    verification: consistency between imgrt and ntv
     validation: consistency with frank_list or cinemagoer
     """
     # sample titleid = tt_random.randint(1, 10145478)
@@ -30,6 +25,100 @@ def veva_title(df):
     # TODO list of validation check (compare with cinemagoer)
     return
 
+def iter_preparing(ITER, frac):
+    old_title = pd.read_csv('old_title.csv', keep_default_na=False, na_values=["NULL"])
+    old_title.columns = ['id', 'title','imdbIndex','kindID', 'year', 'imdbID',
+                         'phoneticCode', 'episodeOfID', 'seasonNr', 'episodeNr', 'seriesYears']#(, 'md5sum'])
+    old_title = old_title.loc[:, ['title', 'year']]          
+
+    new_title_aka = pd.read_csv('new_movie_akas.tsv', sep='\t', keep_default_na=False, na_values=["\\N"])
+    new_title_basic = pd.read_csv('new_movie_basics.tsv', sep='\t', keep_default_na=False, na_values=["\\N"])
+    new_title_basic = new_title_basic.rename(columns = {'originalTitle': 'title', 'startYear': 'year'}) 
+    
+    new_title_basic_cols = ['tconst', 'title', 'year', 'titleType'] # primaryTitle: 4.2m < originalTitle: 4.3m; going with originalTitle
+    new_title_aks_cols = ['tconst',  'title', 'region']
+    
+    main = "outer"
+    if main == "basic_major":
+        new_title = pd.merge(new_title_basic[new_title_basic_cols], new_title_aka[new_title_aks_cols], on=('tconst', 'title' ), how = "left").loc[:, ['tconst', 'title', 'year', 'region', 'titleType']] #11m
+    elif main == "outer": # primaryTitle: 4.2m < originalTitle: 4.3m; going with originalTitle
+        new_title = pd.merge(new_title_basic[new_title_basic_cols], new_title_aka[new_title_aks_cols], on=('tconst', 'title'), how = "outer").loc[:, ['tconst', 'title', 'year', 'region', 'titleType']] #40m
+
+    save_iter(sel_rows_random(old_title, frac=frac), ITER, is_imgrt = True) #imgrt_title.shape[0] 1.7m
+    save_iter(sel_rows_random(new_title, frac=frac), ITER, is_imgrt = False) #ntv_title.shape[0] 10m
+
+def iter_outing(ITER):
+    old_title = pd.read_pickle('old_title.pkl')
+    new_title = pd.read_pickle('new_title_ba_outer.pkl')
+
+    imgrt_title = sel_year(sel_title(old_title, ITER), ITER)
+    ntv_title = sel_year(sel_title(new_title, ITER, is_imgrt=False), ITER, is_imgrt=False)
+    optout_nonus_ntv_title = sel_region(ntv_title) 
+
+    save_iter(imgrt_title, ITER, is_imgrt = True) #imgrt_title.shape[0] 1.7m
+    save_iter(optout_nonus_ntv_title, ITER, is_imgrt = False) #ntv_title.shape[0] 10m
+
+def iter_merging(ITER_IN, ITER):
+    imgrt_title = pd.read_pickle(f'{ITER_IN}_imgrt_title.pkl')
+    ntv_title = pd.read_pickle(f'{ITER_IN}_ntv_title.pkl')
+
+    mo = merge_title(combine_col2id(imgrt_title), ntv_title) #입국사무소통과후 원주민과 조인
+
+    save_iter(mo, ITER)
+
+def iter_ining_gane_eng(ITER_IN, ITER):
+    mo = pd.read_pickle(f'{ITER_IN}' + ".pkl")
+
+    mo_eng = sel_title(mo, ITER)  #sel_region(sel_title(mo, ITER)) 
+    # sel_title(mo)[sel_title(mo).titleId.isnull()]: #77k -> 93k after making 가내수공업개발
+    #mo_eng_usnull = mo_eng[(mo_eng.region == 'US') | mo_eng.region.isnull()] #3m
+    # other ining criteria can exist -> ITER = '3ining_{cirteria}'
+    save_iter(mo_eng, ITER) 
+
+def iter_iding(ITER_IN, ITER):
+    mo = pd.read_pickle(f'{ITER_IN}' + ".pkl")
+
+    def separate_mutant_common_nativeEx(df):
+        df.loc[df.tconst.isnull(), 'gene'] = 'mutant'
+        df.loc[df.imgrt_tyid.isnull(), 'gene'] = 'native_ex'
+        df.loc[(~df.imgrt_tyid.isnull()) & (~df.tconst.isnull()), 'gene'] = 'common'
+        return df
+    mo_mut_com_ne = separate_mutant_common_nativeEx(mo)
+    # title-year duplicate: 173288
+    # among title duplicates (600k), year+-1 difference:
+    # 2,374,000 is unique title and after dropping year1 difference between imgrt-ntv, we would have 2.5m
+
+    save_iter(mo_mut_com_ne, ITER)
+
+def iter_plotting(ITER_IN, ITER):
+    mo_mut_com_ne = pd.read_pickle(f'{ITER_IN}' + ".pkl")
+    mutant = mo_mut_com_ne[mo_mut_com_ne.gene == 'mutant']
+    mutant.year.hist()
+    plt.savefig('mutant.png')
+    #mutant.groupby('year').count().sort_values(by = 'index', ascending=False)
+    save_iter(mutant, ITER)
+
+def iter_title(iter, frac =1):
+    set_dir_moviedata()
+    iter_input =  {'2merging':'1outing', '3ining_gane_eng':'2merging','4iding_mutant':'3ining_gane_eng','5plotting':'4iding_mutant'}
+        
+    if iter == '0preparing': #load data to use
+        iter_preparing(iter, frac)
+
+    elif iter == '1outing': #  "1outing" DATA READ, CLEANING, OPT OUT SELECT ROWS
+        iter_outing(iter)
+
+    elif iter == '2merging':
+        iter_merging(iter_input[iter],iter)
+
+    elif iter == '3ining_gane_eng': #SELECT ROWS: INFER title is ENG
+        iter_ining_gane_eng(iter_input[iter],iter)
+    
+    elif iter == '4iding_mutant': #IDENTIFY MUTANT 
+        iter_iding(iter_input[iter],iter)
+
+    elif iter == '5plotting':
+        iter_plotting(iter_input[iter],iter)
 
 def veva_person(df):
     # """
@@ -65,68 +154,7 @@ def veva_person(df):
 
     return old_person, new_person
 
-
-def make_consistent_title(old_columns = ['title', 'year'], new_columns = ['titleId', 'title', 'year', 'region', 'titleType'], frac =1, IS_SAVE = True, IS_PKL = True):
-    idata_lst = []
-    ##################################################################################
-    ## ITER 1: DATA READ, CLEANING, OPT OUT SELECT ROWS ####################
-    ##################################################################################
-    ITER = 'optout'
-    set_dir_moviedata()
-    #prepare_title_data(IS_SAVE)
-
-    # SELECT COLUMNS
-    # old_movie = pd.read_pickle('old_title.pkl').loc[:, old_columns]
-    # new_movie = pd.read_pickle('new_title.pkl').loc[:, new_columns]
-    old_movie = pd.read_pickle('old_title.pkl').loc[:, old_columns]
-    new_movie = pd.read_pickle('new_title.pkl').loc[:, new_columns]
-    old_movie, new_movie = sel_rows_random(old_movie, new_movie, frac=frac) #.00001
-
-    old_movie = sel_year(sel_title(old_movie, ITER), ITER)
-    new_movie = sel_year(sel_title(new_movie, ITER, is_old=False), ITER, is_old=False)
-    save_iter(old_movie, ITER, IS_SAVE, IS_PKL, is_old = True) #old_movie.shape[0] 1.7m
-    save_iter(new_movie, ITER, IS_SAVE, IS_PKL, is_old = False) #new_movie.shape[0] 10m
-    #compare_mental_material(old_movie, ITER)
-    #compare_mental_material(new_movie, ITER, is_old=False)
-
-    ##################################################################################
-    ## ITER 2: JOIN
-    ##################################################################################
-    ITER = 'join'
-    # TODO sel_title old_movie before or after merge? (if justifiable, the more the better for old)
-
-    # JOIN OLD NEW
-    mo = join_movie(combine_col2id(old_movie), new_movie, is_save=IS_SAVE)
-    save_iter(mo, ITER, IS_SAVE, IS_PKL)
-    compare_mental_material(new_movie, ITER, is_old=False)
-
-    ##################################################################################
-    ## ITER 3: OPT IN SELECT ROWS: INFER title is ENG or then select US region
-    ##################################################################################
-    ITER = 'optin_ganesugong_eng'
-    mo_eng = sel_title(mo, ITER)  #sel_region(sel_title(mo, ITER)) 
-    # sel_title(mo)[sel_title(mo).titleId.isnull()]: #77k -> 93k after making 가내수공업개발
-    # sel_region_type(sel_title(mo))[sel_region_type(sel_title(mo)).titleId.isnull()]: 0
-    save_iter(mo_eng, ITER, IS_SAVE, IS_PKL)
-    compare_mental_material(mo_eng, ITER, is_old=True)
-
-    #mo_eng_us_movie = sel_titleType(mo_eng_us_movie)
-
-    ##################################################################################
-    ## ITER 4: SET DIFFERENCE
-    ##################################################################################
-    ITER = 'diff'
-    old_only = mo_eng[mo_eng.titleId.isnull()]
-    old_only.year.hist()
-    plt.savefig('old_not_new.png')
-    old_only.groupby('year').count().sort_values(by = 'index',ascending=False)
-    save_iter(old_only, ITER, IS_SAVE, IS_PKL)
-    #compare_mental_material(new_movie, ITER, is_old=True)
-    # print compare
-    return
-
-
-def make_consistent_title_person():
+def iter_title_person():
     set_dir_moviedata()
     """
         DBTable('CompleteCast', #1.3m
@@ -135,9 +163,9 @@ def make_consistent_title_person():
             DBCol('subjectID', INTCOL, notNone=True, index='idx_sid'),
             DBCol('statusID', INTCOL, notNone=True)),
     """
-    #old_movie = pd.read_pickle("../data/movie/old_title.pkl")
+    #old_title = pd.read_pickle("../data/movie/old_title.pkl")
     #old_person = pd.read_pickle("old_person.pkl")
-    # old_movie.columns = ['id', 'title','imdbIndex','kindID', 'year', 'imdbID',
+    # old_title.columns = ['id', 'title','imdbIndex','kindID', 'year', 'imdbID',
     #                     'phoneticCode', 'episodeOfID', 'seasonNr', 'episodeNr', 'seriesYears', 'md5sum']
 
     new_person_name_movie = pd.read_pickle('new_person_basics.pkl')

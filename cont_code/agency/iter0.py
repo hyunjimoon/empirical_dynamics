@@ -41,3 +41,9 @@ def pd_set_display():
     pd.set_option('display.width', 1000)
     pd.set_option('display.colheader_justify', 'center')
     pd.set_option('display.precision', 2)
+
+def save_fig(iter_name, plot_name):
+    plot_path = get_plot_path(iter_name)
+    fig_name = f"{plot_path}/{plot_name}"
+    plt.savefig(f"{fig_name}.png")
+    return

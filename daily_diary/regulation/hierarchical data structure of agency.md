@@ -6,10 +6,29 @@
 3: 'Medium Independent Agencies (100-999 employees)': 
 4: 'Small Independent Agencies (less than 100 employees)':   
 
+
+## army
 - 'NN-NATIONAL AERONAUTICS AND SPACE ADMINISTRATION'
 - 'AF-DEPARTMENT OF THE AIR FORCE',
 - 'AR-DEPARTMENT OF THE ARMY',
 - 'DD-DEPARTMENT OF DEFENSE',
+
+## finance
+decrease of org.size + reg.ratio
+financial act e.g. [Dodd–Frank Wall Street Reform and Consumer Protection Act](https://en.wikipedia.org/wiki/Dodd%E2%80%93Frank_Wall_Street_Reform_and_Consumer_Protection_Act#Overview) as the following
+
+- The consolidation of regulatory agencies, elimination of the national thrift charter, and new oversight council to evaluate systemic risk
+- Comprehensive regulation of financial markets, including increased transparency of derivatives (bringing them onto exchanges)
+- Consumer protection reforms including a new consumer protection agency and uniform standards for "plain vanilla" products as well as strengthened investor protection
+- Tools for financial crisis, including a "resolution regime" complementing the existing Federal Deposit Insurance Corporation (FDIC) authority to allow for orderly winding down of bankrupt firms, and including a proposal that the Federal Reserve (the "Fed") receive authorization from the Treasury for extensions of credit in "unusual or exigent circumstances"
+- Various measures aimed at increasing international standards and cooperation including proposals related to improved accounting and tightened regulation of credit rating agencies
+
+```
+'EB-EXPORT-IMPORT BANK OF THE UNITED STATES',
+'FI-FEDERAL FINANCIAL INSTITUTIONS EXAMINATION COUNCIL',
+'GB-INTERNATIONAL DEVELOPMENT FINANCE CORPORATION',
+'HF-FEDERAL HOUSING FINANCE AGENCY',
+```
 - sports, 
 - mng to error rate is global; quality to desired worker is local
 - 

@@ -56,6 +56,19 @@ def hierarchize_org(time, features =['DATECODE','SALARY'], layers=5):
     df.to_pickle(f'{data_path}/{features}.pkl')
     return df
 
+def constrcut_xarray():
+    xr_lst = []
+    for TIME_YEAR in TIME_YEARS:
+        for TIME_MONTH in TIME_MONTHS:
+            hierarchize_org(TIME_YEAR + TIME_MONTH, features)
+            xr_lst.append(pd.read_pickle(get_data_path(f'agency/{TIME_YEAR + TIME_MONTH}') + f'/{features}.pkl').to_xarray())
+    agency98_21 = xr.concat([xr for xr in xr_lst], dim = "index") #47m
+    agency_bytime = agency98_21.groupby('DATECODE')
+    # Q1.from decreasing agytyp mean, (categorized into four as 1: 'Cabinet Level Agencies':  2: 'Large Independent Agencies (1000 or more employees)':  (categorized to 1-4 dep on absolute size) mean
+    # Q2.manager ratio peaked during 20s and is falling
+    mng_ratio = agency_bytime.mean() # 5is_mng count is the number of employee of each agency at each year - how to plot?
+    org_size = agency_bytime.count() # Employement count is the number of employee of each agency at each year - how to plot?
+
 
 def classify_layer(df, layer):
     """

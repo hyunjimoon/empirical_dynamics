@@ -22,7 +22,7 @@
 ### Data, Model, Methodology
 
 Data: 
-- federal agency from 98-21 on nonmanager/manager ratio and organization size. Agency has nested hierarchical structure which is preprocessed as ![[hier_agency]]
+- federal agency from 98-21 on nonmanager/manager ratio and organization size. Agency has nested hierarchical structure which is preprocessed as ![[hierchize_agency]]
 
 Model:
 - stock and flow structure: how task, worker, perceived quality (stock) time series are determined by differential equations

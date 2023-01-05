@@ -1,0 +1,28 @@
+{
+	"nodes":[
+		{"id":"76e3408eb605d7cd","x":10,"y":92,"width":250,"height":60,"type":"text","text":"checking in gane_eng"},
+		{"id":"9ec724a85fdc57a3","x":-431,"y":-75,"width":250,"height":60,"type":"text","text":"forming_merge"},
+		{"id":"175eb805b9ff89d6","x":10,"y":-284,"width":250,"height":60,"type":"text","text":"checking out"},
+		{"id":"b659907e74777da9","x":-431,"y":284,"width":250,"height":60,"type":"text","text":"forming_iding"},
+		{"id":"d095abfddecd4135","x":-431,"y":-520,"width":250,"height":60,"type":"text","text":"preparing"},
+		{"id":"db1615fc34c08e28","x":10,"y":460,"width":250,"height":60,"type":"text","text":"plotting"},
+		{"id":"afc7c1dcd2a8e4be","x":-1284,"y":-484,"width":248,"height":400,"type":"file","file":"ref/ha.png"},
+		{"id":"e6e01fcc51a6e27d","x":-1036,"y":-484,"width":399,"height":146,"type":"file","file":"ref/Roberts.png"},
+		{"id":"10d1044559471df1","x":-953,"y":233,"width":416,"height":162,"type":"text","text":"[[movie_idata plan]]\n출입국사무소에서 이민자들 id부여 \nmutant, common, native_ex\n![[Pasted image 20230104151023.png]]"},
+		{"id":"2ab6bb584db96239","x":-1284,"y":-75,"width":399,"height":143,"type":"file","file":"ref/Pasted image 20230104151223.png"},
+		{"id":"50b4f7a9132776bb","x":-1037,"y":-158,"width":400,"height":143,"type":"file","file":"ref/cruise.png"},
+		{"id":"e80dbced2ef84c2e","x":-1036,"y":-326,"width":399,"height":144,"type":"file","file":"ref/pitt.png"},
+		{"id":"d2282f2e19815b8c","x":316,"y":-290,"width":204,"height":72,"type":"text","text":"remove nan, episode, final, #"},
+		{"id":"a583b67b00890b45","x":378,"y":92,"width":81,"height":60,"type":"text","text":"gane_eng"}
+	],
+	"edges":[
+		{"id":"bdc5115e6a76ac4d","fromNode":"76e3408eb605d7cd","fromSide":"left","toNode":"b659907e74777da9","toSide":"right","color":"1","label":"hodgepodge"},
+		{"id":"b9c6b3d36f267cc1","fromNode":"76e3408eb605d7cd","fromSide":"right","toNode":"a583b67b00890b45","toSide":"left"},
+		{"id":"2a8878f28a2171a2","fromNode":"9ec724a85fdc57a3","fromSide":"right","toNode":"76e3408eb605d7cd","toSide":"left","color":"1","label":"f_s.pkl"},
+		{"id":"f4e590f739d5e653","fromNode":"b659907e74777da9","fromSide":"left","toNode":"10d1044559471df1","toSide":"right"},
+		{"id":"1784a109a4bdc650","fromNode":"b659907e74777da9","fromSide":"right","toNode":"db1615fc34c08e28","toSide":"left","color":"1","label":"mutant"},
+		{"id":"89b4f0ef1e7a95ff","fromNode":"175eb805b9ff89d6","fromSide":"left","toNode":"9ec724a85fdc57a3","toSide":"right","color":"1","label":"c_o.pkl"},
+		{"id":"1c451f348ccc2dcb","fromNode":"d095abfddecd4135","fromSide":"right","toNode":"175eb805b9ff89d6","toSide":"left","color":"1","label":"p.pkl"},
+		{"id":"1d0ce9101f4e24ca","fromNode":"175eb805b9ff89d6","fromSide":"right","toNode":"d2282f2e19815b8c","toSide":"left"}
+	]
+}
